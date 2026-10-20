@@ -1,123 +1,114 @@
-// =====================================================================
-//  internal/rouleau/rouleau.go — LES DEUX ROULEAUX ET LES 11 JUTSUS
-//  Mission 0 (Académie)
-// =====================================================================
-//
-//  Rôle : représenter les deux piles et coder chaque jutsu une fois pour
-//  toutes. ninja_swap, le juge et toutes vos stratégies utiliseront CE
-//  package : ne réécrivez jamais un jutsu ailleurs.
-//
-//  À FAIRE :
-//
-//   1. Choisir une représentation des rouleaux.
-//      Convention conseillée : une slice d'entiers, l'indice 0 = le HAUT.
-//
-//   2. Prévoir une structure qui regroupe le Rouleau du Ciel (A) et le
-//      Rouleau de la Terre (B), et qui COMPTE les jutsus lancés.
-//      (Utile pour vos stratégies et vos mesures.)
-//
-//   3. Coder les 11 jutsus, une fonction (ou méthode) chacun :
-//
-//      sa  / sb  / ss    Kawarimi      échange les 2 archives du haut
-//      pa                Kuchiyose     haut de B → haut de A
-//      pb                Fûin          haut de A → haut de B
-//      ra  / rb  / rr    Rasengan      le haut passe tout en bas
-//      rra / rrb / rrr   Rasengan inv. le bas remonte tout en haut
-//
-//      Les jutsus « en duo » (ss, rr, rrr) comptent pour UN seul jutsu.
-//
-//   4. Chaque jutsu doit être SANS DANGER :
-//      sur un rouleau vide ou à 1 archive, il ne fait rien… et ne plante pas.
-//
-//   5. Prévoir un moyen d'appliquer un jutsu à partir de son nom ("sa", "pb"…).
-//      Le juge en aura besoin. Nom inconnu → renvoyer une erreur.
-//
-//   6. Prévoir une fonction qui dit si A est trié et B vide.
-//
-//  Testez tout dans rouleau_test.go AVANT de passer aux stratégies.
-//
-// =====================================================================
-
 package rouleau
 
-type Vertex struct {
-		Terre int
-		Ciel int
+import "fmt"
+
+type Rouleaux struct {
+	Ciel  []int // A
+	Terre []int // B
+	Count int
 }
 
-var Terre []int 
-var Ciel []int
-var capamax int
+func New(a []int) *Rouleaux {
+	ciel := make([]int, len(a))
+	copy(ciel, a)
+	return &Rouleaux{Ciel: ciel, Terre: []int{}}
+}
 
 
-func sa() {
-	if len(Ciel) < 2 {
+func swap(s []int) {
+	if len(s) < 2 {
 		return
 	}
-	Ciel[0], Ciel[1] = Ciel[1], Ciel[0]
+	s[0], s[1] = s[1], s[0]
 }
 
-func sb() {
-	if len(Terre) < 2 {
+func rot(s []int) {
+	n := len(s)
+	if n < 2 {
 		return
 	}
-	Terre[0], Terre[1] = Terre[1], Terre[0]
+	haut := s[0]
+	copy(s, s[1:])
+	s[n-1] = haut
 }
 
-func ss() {
-	sa()
-	sb()
-}
-
-func pa() {
-	if len(Terre) == 0 {
+func rrot(s []int) {
+	n := len(s)
+	if n < 2 {
 		return
 	}
-	haut := Terre[0]
-	Terre = Terre[1:]
-	Ciel = append([]int{haut}, Ciel...)
+	bas := s[n-1]
+	copy(s[1:], s[:n-1])
+	s[0] = bas
 }
 
-func pb() {
-	if len(Ciel) == 0 {
-		return
+func push(src, dst []int) ([]int, []int) {
+	if len(src) == 0 {
+		return src, dst
 	}
-	haut := Ciel[0]
-	Ciel = Ciel[1:]
-	Terre = append([]int{haut}, Terre...)
+	haut := src[0]
+	return src[1:], append([]int{haut}, dst...)
 }
 
-func ra() {
-	haut := Ciel[0]
-	Ciel = append(Ciel[1:])
-	Ciel = append(Ciel, haut)
+
+func (r *Rouleaux) Sa()  { swap(r.Ciel); r.Count++ }
+func (r *Rouleaux) Sb()  { swap(r.Terre); r.Count++ }
+func (r *Rouleaux) Ss()  { swap(r.Ciel); swap(r.Terre); r.Count++ }
+func (r *Rouleaux) Ra()  { rot(r.Ciel); r.Count++ }
+func (r *Rouleaux) Rb()  { rot(r.Terre); r.Count++ }
+func (r *Rouleaux) Rr()  { rot(r.Ciel); rot(r.Terre); r.Count++ }
+func (r *Rouleaux) Rra() { rrot(r.Ciel); r.Count++ }
+func (r *Rouleaux) Rrb() { rrot(r.Terre); r.Count++ }
+func (r *Rouleaux) Rrr() { rrot(r.Ciel); rrot(r.Terre); r.Count++ }
+
+func (r *Rouleaux) Pa() {
+	r.Terre, r.Ciel = push(r.Terre, r.Ciel)
+	r.Count++
 }
 
-func rb() {
-	haut := Ciel[0]
-	Terre = append(Terre[1:])
-	Terre = append(Terre, haut)
-
+func (r *Rouleaux) Pb() {
+	r.Ciel, r.Terre = push(r.Ciel, r.Terre)
+	r.Count++
 }
 
-func rr() {
-	ra()
-	rb()
+func (r *Rouleaux) Appliquer(nom string) error {
+	switch nom {
+	case "sa":
+		r.Sa()
+	case "sb":
+		r.Sb()
+	case "ss":
+		r.Ss()
+	case "pa":
+		r.Pa()
+	case "pb":
+		r.Pb()
+	case "ra":
+		r.Ra()
+	case "rb":
+		r.Rb()
+	case "rr":
+		r.Rr()
+	case "rra":
+		r.Rra()
+	case "rrb":
+		r.Rrb()
+	case "rrr":
+		r.Rrr()
+	default:
+		return fmt.Errorf("jutsu inconnu : %q", nom)
+	}
+	return nil
 }
 
-func rra() {
-	bas := capamax
-	Ciel = append([]int{bas}, Ciel...)
-	Ciel = append(Ciel[:capamax-1])
-}
-
-func rrb() {
-	bas := capamax
-	Terre = append([]int{bas}, Terre...)
-	Terre = append(Terre[:capamax-1])
-}
-
-func rrr() {
-	rra()
-	rrb()
+func (r *Rouleaux) EstTrie() bool {
+	if len(r.Terre) != 0 {
+		return false
+	}
+	for i := 1; i < len(r.Ciel); i++ {
+		if r.Ciel[i-1] > r.Ciel[i] {
+			return false
+		}
+	}
+	return true
 }
