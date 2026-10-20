@@ -14,7 +14,6 @@ func New(a []int) *Rouleaux {
 	return &Rouleaux{Ciel: ciel, Terre: []int{}}
 }
 
-
 func swap(s []int) {
 	if len(s) < 2 {
 		return
@@ -50,63 +49,62 @@ func push(src, dst []int) ([]int, []int) {
 	return src[1:], append([]int{haut}, dst...)
 }
 
+func (R *Rouleaux) Sa()  { swap(R.Ciel); R.Count++ }
+func (R *Rouleaux) Sb()  { swap(R.Terre); R.Count++ }
+func (R *Rouleaux) Ss()  { swap(R.Ciel); swap(R.Terre); R.Count++ }
+func (R *Rouleaux) Ra()  { rot(R.Ciel); R.Count++ }
+func (R *Rouleaux) Rb()  { rot(R.Terre); R.Count++ }
+func (R *Rouleaux) Rr()  { rot(R.Ciel); rot(R.Terre); R.Count++ }
+func (R *Rouleaux) Rra() { rrot(R.Ciel); R.Count++ }
+func (R *Rouleaux) Rrb() { rrot(R.Terre); R.Count++ }
+func (R *Rouleaux) Rrr() { rrot(R.Ciel); rrot(R.Terre); R.Count++ }
 
-func (r *Rouleaux) Sa()  { swap(r.Ciel); r.Count++ }
-func (r *Rouleaux) Sb()  { swap(r.Terre); r.Count++ }
-func (r *Rouleaux) Ss()  { swap(r.Ciel); swap(r.Terre); r.Count++ }
-func (r *Rouleaux) Ra()  { rot(r.Ciel); r.Count++ }
-func (r *Rouleaux) Rb()  { rot(r.Terre); r.Count++ }
-func (r *Rouleaux) Rr()  { rot(r.Ciel); rot(r.Terre); r.Count++ }
-func (r *Rouleaux) Rra() { rrot(r.Ciel); r.Count++ }
-func (r *Rouleaux) Rrb() { rrot(r.Terre); r.Count++ }
-func (r *Rouleaux) Rrr() { rrot(r.Ciel); rrot(r.Terre); r.Count++ }
-
-func (r *Rouleaux) Pa() {
-	r.Terre, r.Ciel = push(r.Terre, r.Ciel)
-	r.Count++
+func (R *Rouleaux) Pa() {
+	R.Terre, R.Ciel = push(R.Terre, R.Ciel)
+	R.Count++
 }
 
-func (r *Rouleaux) Pb() {
-	r.Ciel, r.Terre = push(r.Ciel, r.Terre)
-	r.Count++
+func (R *Rouleaux) Pb() {
+	R.Ciel, R.Terre = push(R.Ciel, R.Terre)
+	R.Count++
 }
 
-func (r *Rouleaux) Appliquer(nom string) error {
+func (R *Rouleaux) Appliquer(nom string) error {
 	switch nom {
 	case "sa":
-		r.Sa()
+		R.Sa()
 	case "sb":
-		r.Sb()
+		R.Sb()
 	case "ss":
-		r.Ss()
+		R.Ss()
 	case "pa":
-		r.Pa()
+		R.Pa()
 	case "pb":
-		r.Pb()
+		R.Pb()
 	case "ra":
-		r.Ra()
+		R.Ra()
 	case "rb":
-		r.Rb()
+		R.Rb()
 	case "rr":
-		r.Rr()
+		R.Rr()
 	case "rra":
-		r.Rra()
+		R.Rra()
 	case "rrb":
-		r.Rrb()
+		R.Rrb()
 	case "rrr":
-		r.Rrr()
+		R.Rrr()
 	default:
 		return fmt.Errorf("jutsu inconnu : %q", nom)
 	}
 	return nil
 }
 
-func (r *Rouleaux) EstTrie() bool {
-	if len(r.Terre) != 0 {
+func (R *Rouleaux) EstTrie() bool {
+	if len(R.Terre) != 0 {
 		return false
 	}
-	for i := 1; i < len(r.Ciel); i++ {
-		if r.Ciel[i-1] > r.Ciel[i] {
+	for i := 1; i < len(R.Ciel); i++ {
+		if R.Ciel[i-1] > R.Ciel[i] {
 			return false
 		}
 	}

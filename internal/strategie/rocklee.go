@@ -36,3 +36,110 @@
 // =====================================================================
 
 package strategie
+
+import (
+	"ninja-swap/internal/rouleau"
+)
+
+// jouer applique les jutsus sur les rouleaux ET les note dans la suite,
+// pour que main puisse ensuite les afficher un par ligne.
+func jouer(r *rouleau.Rouleaux, suite *[]string, noms ...string) {
+	for _, nom := range noms {
+		if err := r.Appliquer(nom); err != nil {
+			continue // nom connu en dur : ne devrait jamais arriver
+		}
+		*suite = append(*suite, nom)
+	}
+}
+
+// trierDeux : 2 archives, au plus 1 jutsu.
+func trierDeux(r *rouleau.Rouleaux, suite *[]string) {
+	if len(r.Ciel) == 2 && r.Ciel[0] > r.Ciel[1] {
+		jouer(r, suite, "sa")
+	}
+}
+
+// trierTrois : 3 archives dans A, au plus 2 jutsus.
+func trierTrois(r *rouleau.Rouleaux, suite *[]string) {
+	if len(r.Ciel) != 3 {
+		return
+	}
+	a, b, c := r.Ciel[0], r.Ciel[1], r.Ciel[2]
+
+	switch {
+	case a < b && b < c:
+		// déjà trié
+	case a < c && c < b: // 1 3 2
+		jouer(r, suite, "rra", "sa")
+	case b < a && a < c: // 2 1 3
+		jouer(r, suite, "sa")
+	case c < a && a < b: // 2 3 1
+		jouer(r, suite, "rra")
+	case b < c && c < a: // 3 1 2
+		jouer(r, suite, "ra")
+	default: // 3 2 1
+		jouer(r, suite, "sa", "rra")
+	}
+}
+
+// remonterMin amène la plus petite archive de A en haut par le chemin
+// le plus court (ra ou rra).
+func remonterMin(r *rouleau.Rouleaux, suite *[]string) {
+	n := len(r.Ciel)
+	if n < 2 {
+		return
+	}
+	idx := 0
+	for i, v := range r.Ciel {
+		if v < r.Ciel[idx] {
+			idx = i
+		}
+	}
+	if idx <= n/2 {
+		for i := 0; i < idx; i++ {
+			jouer(r, suite, "ra")
+		}
+	} else {
+		for i := 0; i < n-idx; i++ {
+			jouer(r, suite, "rra")
+		}
+	}
+}
+
+// sceller met dans B les k plus petites archives de A, puis trie les
+// 3 restantes et les invoque. Sert pour 4 archives (k=1) et 5 (k=2).
+func sceller(r *rouleau.Rouleaux, suite *[]string, k int) {
+	for i := 0; i < k; i++ {
+		remonterMin(r, suite)
+		jouer(r, suite, "pb")
+	}
+	trierTrois(r, suite)
+	for i := 0; i < k; i++ {
+		jouer(r, suite, "pa")
+	}
+}
+
+// cinq : 5 archives, objectif 12 jutsus maximum.
+func cinq(r *rouleau.Rouleaux, suite *[]string) { sceller(r, suite, 2) }
+
+// quatre : 4 archives.
+func quatre(r *rouleau.Rouleaux, suite *[]string) { sceller(r, suite, 1) }
+
+// PetitesPiles trie 2 à 5 archives, applique les jutsus sur r et renvoie
+// la suite jouée. Pour toute autre taille, ne fait rien.
+func PetitesPiles(r *rouleau.Rouleaux) []string {
+	suite := []string{}
+	if !r.EstTrie() {
+		switch len(r.Ciel) {
+		case 2:
+			trierDeux(r, &suite)
+		case 3:
+			trierTrois(r, &suite)
+		case 4:
+			quatre(r, &suite)
+		case 5:
+			cinq(r, &suite)
+		}
+	}
+	return suite
+}
