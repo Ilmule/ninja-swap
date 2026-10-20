@@ -1,0 +1,14 @@
+# =====================================================================
+#  .gitignore — ce que Git ne doit PAS enregistrer
+# =====================================================================
+#  Les binaires se recompilent : on ne les met jamais dans le dépôt.
+#  Ajoutez ici tout fichier généré par vos mesures (résultats, profils pprof…).
+# =====================================================================
+
+/ninja_swap
+/juge
+/portique
+/reconnaissance
+/byakugan
+*.exe
+*.prof
