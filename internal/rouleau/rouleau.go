@@ -46,7 +46,8 @@ type Vertex struct {
 }
 
 var Terre []int 
-var Ciel []int 
+var Ciel []int
+var capamax int
 
 
 func sa() {
@@ -87,25 +88,36 @@ func pb() {
 }
 
 func ra() {
-
+	haut := Ciel[0]
+	Ciel = append(Ciel[1:])
+	Ciel = append(Ciel, haut)
 }
 
 func rb() {
+	haut := Ciel[0]
+	Terre = append(Terre[1:])
+	Terre = append(Terre, haut)
 
 }
 
 func rr() {
-
+	ra()
+	rb()
 }
 
 func rra() {
-
+	bas := capamax
+	Ciel = append([]int{bas}, Ciel...)
+	Ciel = append(Ciel[:capamax-1])
 }
 
 func rrb() {
-
+	bas := capamax
+	Terre = append([]int{bas}, Terre...)
+	Terre = append(Terre[:capamax-1])
 }
 
 func rrr() {
-
+	rra()
+	rrb()
 }
