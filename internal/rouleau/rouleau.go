@@ -39,3 +39,73 @@
 // =====================================================================
 
 package rouleau
+
+type Vertex struct {
+		Terre int
+		Ciel int
+}
+
+var Terre []int 
+var Ciel []int 
+
+
+func sa() {
+	if len(Ciel) < 2 {
+		return
+	}
+	Ciel[0], Ciel[1] = Ciel[1], Ciel[0]
+}
+
+func sb() {
+	if len(Terre) < 2 {
+		return
+	}
+	Terre[0], Terre[1] = Terre[1], Terre[0]
+}
+
+func ss() {
+	sa()
+	sb()
+}
+
+func pa() {
+	if len(Terre) == 0 {
+		return
+	}
+	haut := Terre[0]
+	Terre = Terre[1:]
+	Ciel = append([]int{haut}, Ciel...)
+}
+
+func pb() {
+	if len(Ciel) == 0 {
+		return
+	}
+	haut := Ciel[0]
+	Ciel = Ciel[1:]
+	Terre = append([]int{haut}, Terre...)
+}
+
+func ra() {
+
+}
+
+func rb() {
+
+}
+
+func rr() {
+
+}
+
+func rra() {
+
+}
+
+func rrb() {
+
+}
+
+func rrr() {
+
+}
