@@ -30,9 +30,6 @@
 package strategie
 
 import (
-	"math/rand"
-	"testing"
-
 	"ninja-swap/internal/rouleau"
 )
 
@@ -49,28 +46,4 @@ func Patrouille(r *rouleau.Rouleaux) []string {
 		jouer(r, &suite, "pa")
 	}
 	return suite
-}
-
-func tirage(n int) []int {
-	return rand.Perm(n)
-}
-
-func TestPatrouilleTrie(t *testing.T) {
-	for _, n := range []int{0, 1, 2, 3, 7, 50} {
-		r := rouleau.New(tirage(n))
-		Patrouille(r)
-		if !r.EstTrie() {
-			t.Fatalf("n=%d : A=%v B=%v", n, r.Ciel, r.Terre)
-		}
-	}
-}
-
-func TestPatrouilleMoyenne(t *testing.T) {
-	for _, n := range []int{100, 500} {
-		total := 0
-		for i := 0; i < 20; i++ {
-			total += len(Patrouille(rouleau.New(tirage(n))))
-		}
-		t.Logf("n=%d : moyenne %d jutsus", n, total/20)
-	}
 }

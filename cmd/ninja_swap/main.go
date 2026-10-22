@@ -80,4 +80,6 @@ func main() {
 	for _, jutsu := range suite {
 		fmt.Fprintln(out, jutsu)
 	}
+
+	
 }

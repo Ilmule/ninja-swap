@@ -15,10 +15,19 @@
 
 _Donnez les commandes exactes pour :_
 
-- _compiler `ninja_swap` et `juge` ;_
-- _lancer un exemple et le vérifier avec le juge ;_
-- _lancer les tests unitaires (`go test ./...`) ;_
-- _lancer `bench.sh`._
+## 1. Compiler, lancer, tester
+
+```bash
+go build -o ninja_swap ./cmd/ninja_swap    # compiler
+go build -o juge ./cmd/juge
+
+ARG="2 3 1 4"
+./ninja_swap $ARG | ./juge $ARG            # exemple + vérification : affiche OK
+
+go test ./...                              # tests unitaires
+```
+
+`bench.sh` : _à compléter._
 
 ## 2. Notre stratégie finale
 
@@ -31,7 +40,7 @@ _Une ligne par version. Ne supprimez jamais une ligne : le chemin compte autant 
 
 | Version | Stratégie | Big-O (jutsus) | Moy. 100 | Moy. 500 | Ce que nous avons appris |
 |---|---|---|---|---|---|
-| v1 | Rock Lee (brute-force) | O(n!) | — | — | Le brute force est un bon début pour voir ce que doit faire le programme m'ai ce n'est vraiment pas efficace |
+| v1 | Rock Lee (brute-force) | O(n!) | — | — | Le brute force est un bon début pour voir ce que doit faire le programme m'ais ce n'est pazs vraiment efficace |
 | v2 | Patrouille | | | | |
 | v3 | | | | | |
 
