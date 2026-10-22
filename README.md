@@ -31,7 +31,7 @@ _Une ligne par version. Ne supprimez jamais une ligne : le chemin compte autant 
 
 | Version | Stratégie | Big-O (jutsus) | Moy. 100 | Moy. 500 | Ce que nous avons appris |
 |---|---|---|---|---|---|
-| v1 | Rock Lee (brute-force) | | — | — | |
+| v1 | Rock Lee (brute-force) | O(n!) | — | — | Le brute force est un bon début pour voir ce que doit faire le programme m'ai ce n'est vraiment pas efficace |
 | v2 | Patrouille | | | | |
 | v3 | | | | | |
 
