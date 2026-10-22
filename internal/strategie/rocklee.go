@@ -38,11 +38,11 @@
 package strategie
 
 import (
+	"sort"
+
 	"ninja-swap/internal/rouleau"
 )
 
-// jouer applique les jutsus sur les rouleaux ET les note dans la suite,
-// pour que main puisse ensuite les afficher un par ligne.
 func jouer(r *rouleau.Rouleaux, suite *[]string, noms ...string) {
 	for _, nom := range noms {
 		if err := r.Appliquer(nom); err != nil {
@@ -52,14 +52,12 @@ func jouer(r *rouleau.Rouleaux, suite *[]string, noms ...string) {
 	}
 }
 
-// trierDeux : 2 archives, au plus 1 jutsu.
 func trierDeux(r *rouleau.Rouleaux, suite *[]string) {
 	if len(r.Ciel) == 2 && r.Ciel[0] > r.Ciel[1] {
 		jouer(r, suite, "sa")
 	}
 }
 
-// trierTrois : 3 archives dans A, au plus 2 jutsus.
 func trierTrois(r *rouleau.Rouleaux, suite *[]string) {
 	if len(r.Ciel) != 3 {
 		return
@@ -82,8 +80,6 @@ func trierTrois(r *rouleau.Rouleaux, suite *[]string) {
 	}
 }
 
-// remonterMin amène la plus petite archive de A en haut par le chemin
-// le plus court (ra ou rra).
 func remonterMin(r *rouleau.Rouleaux, suite *[]string) {
 	n := len(r.Ciel)
 	if n < 2 {
@@ -106,8 +102,6 @@ func remonterMin(r *rouleau.Rouleaux, suite *[]string) {
 	}
 }
 
-// sceller met dans B les k plus petites archives de A, puis trie les
-// 3 restantes et les invoque. Sert pour 4 archives (k=1) et 5 (k=2).
 func sceller(r *rouleau.Rouleaux, suite *[]string, k int) {
 	for i := 0; i < k; i++ {
 		remonterMin(r, suite)
@@ -119,27 +113,103 @@ func sceller(r *rouleau.Rouleaux, suite *[]string, k int) {
 	}
 }
 
-// cinq : 5 archives, objectif 12 jutsus maximum.
 func cinq(r *rouleau.Rouleaux, suite *[]string) { sceller(r, suite, 2) }
 
-// quatre : 4 archives.
 func quatre(r *rouleau.Rouleaux, suite *[]string) { sceller(r, suite, 1) }
 
-// PetitesPiles trie 2 à 5 archives, applique les jutsus sur r et renvoie
-// la suite jouée. Pour toute autre taille, ne fait rien.
+const tailleMaxBrute = 8
+
+var tousLesJutsus = []string{"sa", "sb", "ss", "pa", "pb", "ra", "rb", "rr", "rra", "rrb", "rrr"}
+
+type etat struct {
+	r      *rouleau.Rouleaux
+	parent int
+	jutsu  string
+}
+
+func cle(r *rouleau.Rouleaux) string {
+	b := make([]byte, 0, len(r.Ciel)+len(r.Terre)+1)
+	for _, v := range r.Ciel {
+		b = append(b, byte(v))
+	}
+	b = append(b, 255)
+	for _, v := range r.Terre {
+		b = append(b, byte(v))
+	}
+	return string(b)
+}
+
+func copie(r *rouleau.Rouleaux) *rouleau.Rouleaux {
+	c := rouleau.New(r.Ciel)
+	c.Terre = append([]int{}, r.Terre...)
+	return c
+}
+
+func BruteForce(r *rouleau.Rouleaux) []string {
+	suite := []string{}
+	n := len(r.Ciel)
+	if r.EstTrie() || n > tailleMaxBrute || len(r.Terre) != 0 {
+		return suite
+	}
+
+	tri := append([]int{}, r.Ciel...)
+	sort.Ints(tri)
+	rang := make(map[int]int, n)
+	for i, v := range tri {
+		rang[v] = i
+	}
+	norm := make([]int, n)
+	for i, v := range r.Ciel {
+		norm[i] = rang[v]
+	}
+
+	depart := rouleau.New(norm)
+	file := []etat{{r: depart, parent: -1}}
+	vus := map[string]bool{cle(depart): true}
+
+	for i := 0; i < len(file); i++ {
+		courant := file[i].r
+		file[i].r = nil
+		for _, nom := range tousLesJutsus {
+			suivant := copie(courant)
+			suivant.Appliquer(nom)
+			k := cle(suivant)
+			if vus[k] {
+				continue
+			}
+			vus[k] = true
+			if suivant.EstTrie() {
+				chemin := []string{nom}
+				for j := i; file[j].parent != -1; j = file[j].parent {
+					chemin = append(chemin, file[j].jutsu)
+				}
+				for a, b := 0, len(chemin)-1; a < b; a, b = a+1, b-1 {
+					chemin[a], chemin[b] = chemin[b], chemin[a]
+				}
+				for _, j := range chemin {
+					jouer(r, &suite, j)
+				}
+				return suite
+			}
+			file[i].r = nil
+			file = append(file, etat{r: suivant, parent: i, jutsu: nom})
+		}
+	}
+	return suite 
+}
+
 func PetitesPiles(r *rouleau.Rouleaux) []string {
 	suite := []string{}
-	if !r.EstTrie() {
-		switch len(r.Ciel) {
-		case 2:
-			trierDeux(r, &suite)
-		case 3:
-			trierTrois(r, &suite)
-		case 4:
-			quatre(r, &suite)
-		case 5:
-			cinq(r, &suite)
-		}
+	if r.EstTrie() {
+		return suite
+	}
+	switch len(r.Ciel) {
+	case 2:
+		trierDeux(r, &suite)
+	case 3:
+		trierTrois(r, &suite)
+	case 4, 5:
+		return BruteForce(r)
 	}
 	return suite
 }
