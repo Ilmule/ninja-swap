@@ -62,3 +62,53 @@ func TestArgs(t *testing.T) {
 		t.Errorf("doublons devraient être permis : %v", err)
 	}
 }
+
+// Cas limites supplémentaires.
+func TestArgsLimites(t *testing.T) {
+	mauvais := [][]string{
+		{" 5"},
+		{"5 "},
+		{"1.5"},
+		{"0x10"},
+		{"--5"},
+		{"5-"},
+		{"1", "01"},  // 01 vaut 1 : doublon
+		{"0", "-0"},  // -0 vaut 0 : doublon
+		{"1", "2", "3", "2"},
+	}
+	for _, c := range mauvais {
+		if _, err := Args(c); err == nil {
+			t.Errorf("%q devrait être refusé", c)
+		}
+	}
+}
+
+// Les valeurs renvoyées sont dans l'ordre des arguments.
+func TestArgsValeurs(t *testing.T) {
+	got, err := Args([]string{"3", "-1", "2147483647", "-2147483648", "0"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []int{3, -1, 2147483647, -2147483648, 0}
+	if len(got) != len(want) {
+		t.Fatalf("obtenu %v, attendu %v", got, want)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("obtenu %v, attendu %v", got, want)
+		}
+	}
+}
+
+// Avec doublons permis, les valeurs invalides restent refusées.
+func TestArgsAvecDoublonsInvalides(t *testing.T) {
+	got, err := ArgsAvecDoublons([]string{"1", "5", "1"})
+	if err != nil || len(got) != 3 {
+		t.Errorf("1 5 1 : obtenu %v, %v", got, err)
+	}
+	for _, c := range [][]string{{"kunai"}, {"-"}, {"2147483648"}, {""}} {
+		if _, err := ArgsAvecDoublons(c); err == nil {
+			t.Errorf("%q devrait être refusé même avec doublons", c)
+		}
+	}
+}
