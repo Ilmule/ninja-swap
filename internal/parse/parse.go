@@ -34,3 +34,45 @@
 // =====================================================================
 
 package parse
+
+import (
+	"errors"
+	"fmt"
+	"strconv"
+)
+
+// Args convertit les arguments en entiers int32 (stockés en int).
+// Les doublons sont refusés.
+func Args(args []string) ([]int, error) {
+	return parse(args, false)
+}
+
+// ArgsAvecDoublons fait pareil, mais autorise les doublons
+// (mission secrète « Reconnaissance urbaine », option --doublons).
+func ArgsAvecDoublons(args []string) ([]int, error) {
+	return parse(args, true)
+}
+
+func parse(args []string, doublons bool) ([]int, error) {
+	nums := make([]int, 0, len(args))
+	vus := make(map[int]bool, len(args))
+
+	for _, s := range args {
+		// bitSize 32 : refuse tout ce qui sort de [-2147483648 ; 2147483647]
+		// refuse aussi "", "-", "4-2", "kunai", " 5"
+		n64, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return nil, fmt.Errorf("argument invalide %q : %w", s, err)
+		}
+		n := int(n64)
+
+		if !doublons {
+			if vus[n] {
+				return nil, errors.New("doublon : " + s)
+			}
+			vus[n] = true
+		}
+		nums = append(nums, n)
+	}
+	return nums, nil
+}
