@@ -38,6 +38,45 @@
 
 package main
 
+import (
+	"bufio"
+	"fmt"
+	"os"
+
+	"ninja-swap/internal/parse"   // adapte "ninja_swap" au nom du module dans go.mod
+	"ninja-swap/internal/rouleau"
+)
+
+func erreur() {
+	fmt.Fprintln(os.Stderr, "Error")
+	os.Exit(1)
+}
+
 func main() {
-	// TODO : à vous de jouer, genin.
+	// 1. Mêmes arguments, même validation que ninja_swap
+	nums, err := parse.Args(os.Args[1:])
+	if err != nil {
+		erreur()
+	}
+
+	// 2. Ciel = nums, Terre = vide
+	r := rouleau.New(nums)
+
+	// 3. Lecture ligne par ligne
+	sc := bufio.NewScanner(os.Stdin)
+	for sc.Scan() {
+		if err := r.Appliquer(sc.Text()); err != nil {
+			erreur()
+		}
+	}
+	if sc.Err() != nil {
+		erreur()
+	}
+
+	// 4. Verdict
+	if r.EstTrie() {
+		fmt.Println("OK")
+	} else {
+		fmt.Println("KO")
+	}
 }
