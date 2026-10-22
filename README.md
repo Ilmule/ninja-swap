@@ -1,4 +1,4 @@
-# Rouleau de l'équipe n° __
+# Rouleau de l'équipe n° jsp
 
 > **Consigne :** ce README est le « Rouleau de l'équipe ». Il est noté (documentation et analyse de complexité).
 > Remplacez chaque bloc de consignes en italique par votre propre contenu, et supprimez les consignes à la fin.
@@ -7,7 +7,7 @@
 > Poussez votre travail à la fin de CHAQUE séance, par les deux membres de l'équipe.
 > Donnez accès à ce dépôt au Hokage et à Rémy dès la première séance.
 
-**Genin :** _Prénom NOM_ · _Prénom NOM_
+**Genin :** _Emeric Van Autryve_ · _Hugo Laude_
 
 ---
 
@@ -31,7 +31,7 @@ _Une ligne par version. Ne supprimez jamais une ligne : le chemin compte autant 
 
 | Version | Stratégie | Big-O (jutsus) | Moy. 100 | Moy. 500 | Ce que nous avons appris |
 |---|---|---|---|---|---|
-| v1 | Rock Lee (brute-force) | | — | — | |
+| v1 | Rock Lee (brute-force) | O(n!) | — | — | Le brute force est un bon début pour voir ce que doit faire le programme m'ai ce n'est vraiment pas efficace |
 | v2 | Patrouille | | | | |
 | v3 | | | | | |
 
@@ -39,7 +39,9 @@ _Une ligne par version. Ne supprimez jamais une ligne : le chemin compte autant 
 
 ### Mission 1 — Rock Lee
 - _Que devient le temps de calcul du brute-force entre 5 et 7 archives ? Pourquoi ?_
+Il se démultiplie car on à d'un seul coup bien plus de comparaisons et d'échanges à faire.
 - _Quelle est la complexité (Big-O) de votre brute-force ?_
+O(n!)
 
 ### Mission 2 — La patrouille
 - _Pourquoi cette méthode est-elle en O(n²) ?_
