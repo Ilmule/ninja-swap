@@ -41,6 +41,43 @@
 
 package main
 
+import (
+	"bufio"
+	"fmt"
+	"os"
+
+	"ninja-swap/internal/parse"
+	"ninja-swap/internal/rouleau"
+	"ninja-swap/internal/strategie"
+)
+
 func main() {
-	// TODO : à vous de jouer, genin.
+	args := os.Args[1:]
+	if len(args) == 0 {
+		return
+	}
+
+	nombres, err := parse.Args(args)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error")
+		os.Exit(1)
+	}
+
+	r := rouleau.New(nombres)
+	if r.EstTrie() {
+		return
+	}
+
+	var suite []string
+	if n := len(r.Ciel); n <= 5 {
+		suite = strategie.PetitesPiles(r)
+	} else {
+		suite = strategie.Patrouille(r)
+	}
+
+	out := bufio.NewWriter(os.Stdout)
+	defer out.Flush()
+	for _, jutsu := range suite {
+		fmt.Fprintln(out, jutsu)
+	}
 }
