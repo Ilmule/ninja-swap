@@ -39,7 +39,7 @@ func Patrouille(r *rouleau.Rouleaux) []string {
 		return suite
 	}
 	for len(r.Ciel) > 0 {
-		remonterMin(r, &suite) // ra ou rra : le chemin le plus court
+		remonterMin(r, &suite)
 		jouer(r, &suite, "pb")
 	}
 	for len(r.Terre) > 0 {
