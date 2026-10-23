@@ -137,7 +137,6 @@ func TestCompteur(t *testing.T) {
 	}
 }
 
-// Un nom de jutsu inconnu renvoie une erreur et ne modifie rien.
 func TestJutsuInconnu(t *testing.T) {
 	for _, nom := range []string{"", "xx", "SA", "sa ", "rrra", "pc"} {
 		r := New([]int{3, 1, 2})
@@ -150,7 +149,6 @@ func TestJutsuInconnu(t *testing.T) {
 	}
 }
 
-// « A trié et B vide ».
 func TestEstTrie(t *testing.T) {
 	cas := []struct {
 		a, b []int
@@ -162,7 +160,7 @@ func TestEstTrie(t *testing.T) {
 		{[]int{-5, 0, 7}, []int{}, true},
 		{[]int{2, 1, 3}, []int{}, false},
 		{[]int{3, 2, 1}, []int{}, false},
-		{[]int{1, 2, 3}, []int{4}, false}, // B non vide
+		{[]int{1, 2, 3}, []int{4}, false}, 
 		{[]int{}, []int{1}, false},
 	}
 	for _, c := range cas {
@@ -174,7 +172,6 @@ func TestEstTrie(t *testing.T) {
 	}
 }
 
-// New copie la liste reçue : modifier les rouleaux ne touche pas l'original.
 func TestNewCopie(t *testing.T) {
 	orig := []int{3, 1, 2}
 	r := New(orig)
@@ -188,7 +185,6 @@ func TestNewCopie(t *testing.T) {
 	}
 }
 
-// Une suite de jutsus qui trie : l'exemple du sujet, 2 3 1 4 → pb sa pa sa.
 func TestExempleSujet(t *testing.T) {
 	r := New([]int{2, 3, 1, 4})
 	for _, nom := range []string{"pb", "sa", "pa", "sa"} {

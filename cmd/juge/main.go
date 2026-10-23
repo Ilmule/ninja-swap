@@ -43,7 +43,7 @@ import (
 	"fmt"
 	"os"
 
-	"ninja-swap/internal/parse"   // adapte "ninja_swap" au nom du module dans go.mod
+	"ninja-swap/internal/parse"
 	"ninja-swap/internal/rouleau"
 )
 
