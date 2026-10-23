@@ -54,19 +54,25 @@ O(n!)
 
 ### Mission 2 — La patrouille
 - _Pourquoi cette méthode est-elle en O(n²) ?_
+car plus on as d'archive plus on as de chakra (fonction) c'est donc la caractéristique d'un O(n²).
 - _Le programme est-il lent à calculer, ou seulement « cher » en jutsus ?_
+il est juste cher en justus car chaque justu est très rapide a calculer, il y en as juste des milliers.
 
 ### Mission 3 — Shikamaru
 - _Pourquoi la normalisation simplifie-t-elle autant le problème ?_
+La normalisation simplifie le problème car elle rend les valeurs bien plus facile a utiliser.
 - _Comment avez-vous choisi la taille de vos escouades ? Montrez vos mesures._
+Le tri radix qui rend la chose plus simple car nous n'avons pas de taille d'escouade a définir.
 
 ### Mission 4 — Le contrôle du chakra
 - _Que coûte en calcul la recherche de l'archive la moins chère à chaque tour ? Quelle complexité totale ?_
+On regarde chaque archive, donc la recherche coûte O(n) par tour et O(n²) au total. Avec les déplacements dans les slices, le programme peut aller jusqu’à O(n³) dans le pire des cas.
 - _Quelle amélioration vous a fait gagner le plus ? Laquelle vous a déçus ?_
+Tester plusieurs départs nous a fait gagne plus : environ 5 171 à 5 117 jutsus en simulation. Par contre, envoyer trois archives dans B au départ, au lieu de deux n’a presque rien changé.
 
 ## 5. Le travail d'équipe
-
 _Qui a fait quoi ? Comment avez-vous alterné pilote et copilote à chaque séance ?_
+Nous avons travaillé en binome en faiseant en sorte que quand l'un travaille, l'autre l'aide mais nous ne sommes jamais 2 à travailler en même temps
 
 ## 6. Missions secrètes (facultatif)
 
