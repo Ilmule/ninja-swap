@@ -35,3 +35,163 @@
 // =====================================================================
 
 package strategie
+
+import (
+	"fmt"
+	"math/rand"
+	"sort"
+
+	"ninja-swap/internal/rouleau"
+)
+
+func normaliser(nombres []int) []int {
+	copie := make([]int, len(nombres))
+	copy(copie, nombres)
+	sort.Ints(copie)
+
+	rangs := make([]int, len(nombres))
+
+	for i, nombre := range nombres {
+		for rang, valeur := range copie {
+			if nombre == valeur {
+				rangs[i] = rang
+				break
+			}
+		}
+	}
+
+	return rangs
+}
+
+func Shikamaru(nombres []int) []string {
+	r := rouleau.New(normaliser(nombres))
+	operations := []string{}
+
+	if r.EstTrie() {
+		return operations
+	}
+
+	maximum := len(r.Ciel) - 1
+
+	for bit := 0; (maximum >> bit) > 0; bit++ {
+		nombreATraiter := len(r.Ciel)
+
+		for i := 0; i < nombreATraiter; i++ {
+			if (r.Ciel[0]>>bit)&1 == 0 {
+				r.Pb()
+				operations = append(operations, "pb")
+			} else {
+				r.Ra()
+				operations = append(operations, "ra")
+			}
+		}
+
+		for len(r.Terre) > 0 {
+			r.Pa()
+			operations = append(operations, "pa")
+		}
+	}
+
+	return operations
+}
+
+func patrouilleReference(nombres []int) []string {
+	r := rouleau.New(nombres)
+	operations := []string{}
+
+	if r.EstTrie() {
+		return operations
+	}
+
+	for len(r.Ciel) > 0 {
+		positionMinimum := 0
+
+		for i := 1; i < len(r.Ciel); i++ {
+			if r.Ciel[i] < r.Ciel[positionMinimum] {
+				positionMinimum = i
+			}
+		}
+
+		if positionMinimum <= len(r.Ciel)/2 {
+			for i := 0; i < positionMinimum; i++ {
+				r.Ra()
+				operations = append(operations, "ra")
+			}
+		} else {
+			rotations := len(r.Ciel) - positionMinimum
+
+			for i := 0; i < rotations; i++ {
+				r.Rra()
+				operations = append(operations, "rra")
+			}
+		}
+
+		r.Pb()
+		operations = append(operations, "pb")
+	}
+
+	for len(r.Terre) > 0 {
+		r.Pa()
+		operations = append(operations, "pa")
+	}
+
+	return operations
+}
+
+func verifierOperations(nombres []int, operations []string) error {
+	juge := rouleau.New(nombres)
+
+	for _, operation := range operations {
+		if err := juge.Appliquer(operation); err != nil {
+			return err
+		}
+	}
+
+	if !juge.EstTrie() {
+		return fmt.Errorf("le resultat n'est pas trie")
+	}
+
+	return nil
+}
+
+func MesurerStrategies() error {
+	hasard := rand.New(rand.NewSource(42))
+
+	for _, taille := range []int{100, 500} {
+		totalShikamaru := 0
+		totalPatrouille := 0
+
+		for essai := 0; essai < 20; essai++ {
+			nombres := hasard.Perm(taille)
+
+			resultatShikamaru := Shikamaru(nombres)
+			resultatPatrouille := patrouilleReference(nombres)
+
+			if err := verifierOperations(nombres, resultatShikamaru); err != nil {
+				return fmt.Errorf(
+					"Shikamaru, taille %d, essai %d : %w",
+					taille, essai+1, err,
+				)
+			}
+
+			if err := verifierOperations(nombres, resultatPatrouille); err != nil {
+				return fmt.Errorf(
+					"patrouille, taille %d, essai %d : %w",
+					taille, essai+1, err,
+				)
+			}
+
+			totalShikamaru += len(resultatShikamaru)
+			totalPatrouille += len(resultatPatrouille)
+		}
+
+		fmt.Printf(
+			"%d nombres : Shikamaru %.2f jutsus, patrouille %.2f jutsus\n",
+			taille,
+			float64(totalShikamaru)/20,
+			float64(totalPatrouille)/20,
+		)
+	}
+
+	return nil
+}
